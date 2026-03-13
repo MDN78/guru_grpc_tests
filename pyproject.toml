@@ -8,9 +8,16 @@ authors = [
 readme = "README.md"
 requires-python = "^3.14"
 dependencies = [
+    "pbreflect (>=1.1.1,<2.0.0)",
+    "pytest (>=9.0.2,<10.0.0)",
+    "allure-pytest (>=2.15.3,<3.0.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+
+addopts = "--alluredir=../allure-results"
