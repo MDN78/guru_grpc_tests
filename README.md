@@ -38,6 +38,32 @@ pbreflect generate --proto-dir ./protos --output-dir ./internal/pb --gen-type pb
 3. Обновили тесты - на получение всех валют и на обмен
 4. Написали интерцептор на Allure и добавили его в grpc_client
 
-### Мокирование с Wiremock: переключение между тестовым и целевым сервисом  
+### Мокирование с Wiremock: переключение между тестовым и целевым сервисом   
+Сервис чтобы wiremock мог работать с grpc
+[wiremock](https://github.com/wiremock/grpc-wiremock)  
+более старый образ, но работает стабильно, используем его:
+[old wiremock](https://github.com/Adven27/grpc-wiremock)
 
-
+Чтобы сконфигурировать мы должны замаппить запрос с ответом, что ожидаем.
+В приложении Niffler уже есть заготовка: `wiremock->grpc->mappings`
+И в docker-compose.mock.yml уже используем:
+```dockerfile
+services:
+  currency.niffler.dc:
+    container_name: currency.niffler.dc
+    image: adven27/grpc-wiremock:latest
+    volumes:
+      - ./wiremock/grpc:/wiremock                     #stubs
+      - ./niffler-grpc-common/src/main/proto:/proto   #proto
+    ports:
+      - 8888:8888                                     # wiremock port
+      - 8092:8092                                     # gRPC port
+    environment:
+      - GRPC_SERVER_PORT=8092
+    networks:
+      - niffler-network
+```
+- скопируем yml файл и маппинги к нам в проект и отдельной фикстурой будем переключаться с реального сервиса на moc
+- поправить пути в yml файле и порт
+- фикстура по выбору приложения
+- конфигурационный файл - pydantic settings + создать фикстуру
